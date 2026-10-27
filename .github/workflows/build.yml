@@ -176,10 +176,11 @@ jobs:
       # Corrosion version and aurora bumps its nod version, update aurora version and remove workaround.
       - name: Fetch fixed Corrosion
         if: matrix.platform == 'macos'
-        run: |
-          git init "$RUNNER_TEMP/corrosion"
-          git -C "$RUNNER_TEMP/corrosion" fetch --depth 1 https://github.com/corrosion-rs/corrosion.git 2522f7abad9eaa88b05d07fd492841c529ca2bf1
-          git -C "$RUNNER_TEMP/corrosion" checkout FETCH_HEAD
+        uses: actions/checkout@v6
+        with:
+          repository: corrosion-rs/corrosion
+          ref: 2522f7abad9eaa88b05d07fd492841c529ca2bf1
+          path: corrosion
 
       - name: Configure CMake
         if: matrix.platform != 'macos'
@@ -189,7 +190,7 @@ jobs:
       # when Corrosion bug is fixed as detailed in the comment of step "Fetch fixed Corrosion"
       - name: Configure CMake (macOS)
         if: matrix.platform == 'macos'
-        run: cmake --preset ${{matrix.preset}} -DFETCHCONTENT_SOURCE_DIR_CORROSION="$RUNNER_TEMP/corrosion"
+        run: cmake --preset ${{matrix.preset}} -DFETCHCONTENT_SOURCE_DIR_CORROSION="$GITHUB_WORKSPACE/corrosion"
 
       - name: Build
         run: cmake --build --preset ${{matrix.preset}}
